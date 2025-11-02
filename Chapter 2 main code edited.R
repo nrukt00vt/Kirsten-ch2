@@ -6,19 +6,20 @@ library(ggplot2)
 library(igraph)
 
 #Read in migratory bird and human adjancency matrices
-bird_adj = as.matrix(read.csv("county_adjacency_matrix_blue_winged_teal_county.csv")[,-1])
-human_adj = as.matrix(read.csv("county_adjacency_matrix_mourning_dove_county.csv")[,-1])
+bird_adj = as.matrix(read.csv("adj2/county_adjacency_matrix_blue_winged_teal_county_y.csv")[,-1])
+human_adj = as.matrix(read.csv("adj2/county_adjacency_matrix_mourning_dove_county_n.csv")[,-1])
 
 #Read in poultry
-poultry = as.matrix.data.frame(read.csv("county_adjacency_matrix_cuckoos_etc_county.csv")[,-1])
+poultry = read.csv("NABBP_2023_grp_06.csv")[,-1]
 
 #Read in the spatial layer
-counties = read_sf(dsn = "gadm36", layer = "gadm36_2")
+counties = read_sf(dsn = "gadm36_levels_shp", layer = "gadm36_2")
 counties = subset(counties,is.element(NAME_0,c("Canada","United States","Mexico")))
 
 
 #Associate poultry data with locations
 #coords from banding data, change to location in poultry data
+poultry = subset(poultry, !is.na(LON_DD) & !is.na(LAT_DD))
 poultry_sf = st_as_sf(poultry, coords = c("LON_DD", "LAT_DD"))
 st_crs(poultry_sf) = st_crs(counties)
 
@@ -28,22 +29,21 @@ poultry_sf$ID = 1:nrow(poultry_sf)
 counties_visitied = st_join(poultry_sf, counties, join = st_intersects)
 counties_visitied_sub = st_drop_geometry(counties_visitied[,c("ID", "GID_2")])
 
-setDT(counties_visitied_sub);setDT(poultry_sf)
+setDT(counties_visitied);setDT(poultry_sf)
 
 
 #merge county IDs with original dataset 
-poultry_with_counties = counties_visitied_sub[poultry_sf, mult = "first", on = "ID", nomatch = 0L]
+poultry_with_counties = counties_visitied[poultry_sf, mult = "first", on = "BAND", nomatch = 0L]
 
 ####Preparing for disease simulation#####
 
 # Disease states: 0 = susceptible, 1 = infected
-bird_state <- rep(0, 10)
-poultry_state <- rep(0, 10)
-human_state <- rep(0, 10)
+bird_state <- rep(0,nrow(counties))
+poultry_state <- rep(0, nrow(counties))
+human_state <- rep(0, nrow(counties))
 
 # Introduce disease in migratory birds
-bird_state[sample(1:length(bird_adj), 2)] <- 1
-
+bird_state[sample(1:length(bird_state),  3)] <- 1
 # Parameters
 beta_bird_poultry <- 0.3   # transmission from bird to poultry
 beta_poultry_human <- 0.2  # transmission from poultry to humans
@@ -63,8 +63,8 @@ cross_trans_edges <- list()
 
 # Initialize vector to store initial infection location for each bird and poultry
 #Not accurate for current code
-bird_origin <- rep(NA, 10)
-poultry_origin <-rep(NA, 10)
+bird_origin <- rep(NA, nrow(counties))
+poultry_origin <-rep(NA, nrow(counties))
 
 #Currently does not take in to account poultry to poultry transmission
 for (t in 1:timesteps) {
