@@ -9,14 +9,12 @@ library(igraph)
 bird_adj = as.matrix(read.csv("adj2/county_adjacency_matrix_blue_winged_teal_county_y.csv")[,-1])
 human_adj = as.matrix(read.csv("adj2/county_adjacency_matrix_mourning_dove_county_n.csv")[,-1])
 
-#Read in poultry
-poultry = read.csv("NABBP_2023_grp_06.csv")[,-1]
-
 #Read in the spatial layer
 counties = read_sf(dsn = "gadm36_levels_shp", layer = "gadm36_2")
 counties = subset(counties,is.element(NAME_0,c("Canada","United States","Mexico")))
 
-
+#randomly assign farm numbers to counties
+counties$farm_number = sample(0:10, nrow(counties), replace = T)
 #Associate poultry data with locations
 #coords from banding data, change to location in poultry data
 poultry = subset(poultry, !is.na(LON_DD) & !is.na(LAT_DD))
@@ -34,7 +32,6 @@ setDT(counties_visitied);setDT(poultry_sf)
 
 #merge county IDs with original dataset 
 poultry_with_counties = counties_visitied[poultry_sf, mult = "first", on = "BAND", nomatch = 0L]
-
 ####Preparing for disease simulation#####
 
 # Disease states: 0 = susceptible, 1 = infected
