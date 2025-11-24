@@ -1,2 +1,4 @@
 *.shp
 *.dbf
+.Rhistory
+.DS_Store
