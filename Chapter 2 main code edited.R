@@ -16,6 +16,8 @@ counties = subset(counties,is.element(NAME_0,c("Canada","United States","Mexico"
 #randomly assign farm numbers to counties
 counties$farm_number = sample(0:10, nrow(counties), replace = T)
 #Associate poultry data with locations
+
+
 #coords from banding data, change to location in poultry data
 poultry = subset(poultry, !is.na(LON_DD) & !is.na(LAT_DD))
 poultry_sf = st_as_sf(poultry, coords = c("LON_DD", "LAT_DD"))
@@ -42,11 +44,15 @@ human_state <- rep(0, nrow(counties))
 # Introduce disease in migratory birds
 bird_state[sample(1:length(bird_state),  3)] <- 1
 # Parameters
-beta_bird_poultry <- 0.3   # transmission from bird to poultry
+beta_bird_poultry <- 0.1   # transmission from bird to poultry
+beta_bird_poultry_max <- 0.5  #within-poultry spread
+
 beta_poultry_human <- 0.2  # transmission from poultry to humans
-beta_bird_bird <- 0.1      # within-bird spread
+beta_bird_bird <- 0.01      # within-bird spread
+beta_bird_bird_max <-.5
 beta_human_human <- 0.05   # within-human spread
-beta_poultry_poulty <- 0.3  #within-poultry spread
+beta_poultry_poulty <- 0.03  #within-poultry spread
+beta_poultry_poulty_max <- 0.5  #within-poultry spread
 
 #Transmission model 
 # Initialize edge lists for tracking transmission
@@ -67,22 +73,30 @@ poultry_origin <-rep(NA, nrow(counties))
 for (t in 1:timesteps) {
   # Spread among birds
   bird_infections <- which(bird_state == 0 & (bird_adj %*% (bird_state == 1)) > 0)
-  for (i in bird_infections) {
-    if (rbinom(1, 1, beta_bird_bird)) {
-      bird_state[i] <- 1
+  bird_infections_weight <-as.numeric(bird_adj %*% (bird_state == 1))[bird_infections]
+  for (i in 1:length(bird_infections)) {
+    bird_infection_probability = beta_bird_bird + (beta_bird_bird_max - beta_bird_bird) * bird_infections_weight[i] / (bird_infections_weight[i] + 100)
+    print(bird_infection_probability)
+    if (rbinom(1, 1, bird_infection_probability)) {
+      bird_state[bird_infections[i]] <- 1
       # Record which infected neighbor caused it
-      infectors <- which(bird_adj[i, ] == 1 & bird_state == 1)
+      infectors <- which(bird_adj[bird_infections[i], ] == 1 & bird_state == 1)
       if (length(infectors) > 0) {
-        bird_trans_edges[[length(bird_trans_edges) + 1]] <- c(sample(infectors, 1), i)
+        bird_trans_edges[[length(bird_trans_edges) + 1]] <- c(sample(infectors, 1), bird_infections[i])
       }
     }
   }
   
   # Bird → Poultry
-  for (i in 1:10) {
+  for (i in 1:length(bird_state)) {
+    
+
     if (bird_state[i] == 1 && poultry_state[i] == 0) {
-      if (rbinom(1, 1, beta_bird_poultry)) {
+      bird_infection_probability = beta_bird_poultry + (beta_bird_poultry_max - beta_bird_poultry) * counties$poultry_farms[i] / (counties$poultry_farms[i] + 100)
+      
+      if (rbinom(1, 1, bird_infection_probability)) {
         poultry_state[i] <- 1
+        print(i)
         cross_trans_edges[[length(cross_trans_edges) + 1]] <- c(paste0("Bird", i), paste0("Poultry", i))
       }
     }
@@ -102,9 +116,11 @@ for (t in 1:timesteps) {
   # }
   
   # Poultry → Human
-  for (i in 1:10) {
+  for (i in 1:1:length(bird_state)) {
     if (poultry_state[i] == 1 && human_state[i] == 0) {
-      if (rbinom(1, 1, beta_poultry_human)) {
+      human_infection_probability = beta_poultry_human + (beta_bird_poultry_max - beta_poultry_human) * counties$poultry_farms[i] / (counties$poultry_farms[i] + 100)
+      
+      if (rbinom(1, 1, human_infection_probability)) {
         human_state[i] <- 1
         cross_trans_edges[[length(cross_trans_edges) + 1]] <- c(paste0("Poultry", i), paste0("Human", i))
       }
@@ -112,7 +128,7 @@ for (t in 1:timesteps) {
   }
   
   # During transmission, record the origin
-  for (i in 1:10) {
+  for (i in 1:length(bird_state)) {
     if (bird_state[i] && poultry_state[i] == 1 && human_state[i] == 0 && rbinom(1, 1, beta_poultry_human)) {
       human_state[i] <- 1
       # Find the source poultry's origin
