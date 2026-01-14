@@ -23,6 +23,7 @@ human_pop=projectRaster(human_pop, crs=wgs)
 counties = read_sf(dsn = "gadm36_levels_shp", layer = "gadm36_2")
 counties = subset(counties,is.element(NAME_0,c("Canada","United States","Mexico")))
 counties$human_pop <- exact_extract(human_pop, counties, fun = "sum")
+counties$newID = 1:nrow(counties)
 
 #randomly assign farm numbers to counties
 counties$farm_number = sample(0:10, nrow(counties), replace = T)
@@ -129,7 +130,7 @@ for (t in 1:timesteps) {
   # }
   
   # Poultry → Human
-  for (i in 1:1:length(bird_state)) {
+  for (i in 1:length(bird_state)) {
     if (poultry_state[i] == 1 && human_state[i] == 0) {
       human_infection_probability = beta_human_human + (beta_human_human_max - beta_human_human) * counties$human_pop[i] / (counties$human_pop[i] + mean(counties$human_pop))
       print(human_infection_probability)
@@ -141,21 +142,25 @@ for (t in 1:timesteps) {
     }
   }
   
-  }
+  
   
   # Human → Human
-  # human_infections <- which(human_state == 0 & (human_adj %*% (human_state == 1)) > 0)
-  # for (i in human_infections) {
-  #   if (rbinom(1, 1, beta_human_human)) {
-  #     human_state[i] <- 1
-  #     infectors <- which(human_adj[i, ] == 1 & human_state == 1)
-  #     if (length(infectors) > 0) {
-  #       human_trans_edges[[length(human_trans_edges) + 1]] <- c(sample(infectors, 1), i)
-  #     }
-  #   }
-  # }
+human_infections <- which(human_state == 0 & (human_adj %*% (human_state == 1)) > 0)
+human_infections_weight <-as.numeric(human_adj %*% (human_state == 1))[human_infections]
+for (i in 1:length(human_infections)) {
+  human_infection_probability = beta_human_human + (beta_human_human_max - beta_human_human) * human_infections_weight[i] / (human_infections_weight[i] + 100)
+  #print(human_infection_probability)
+  if (rbinom(1, 1, human_infection_probability)) {
+    human_state[human_infections[i]] <- 1
+    # Record which infected neighbor caused it
+    human_infectors <- which(human_adj[human_infections[i], ] == 1 & human_state == 1)
+    if (length(human_infectors) > 0) {
+      human_trans_edges[[length(human_trans_edges) + 1]] <- c(sample(infectors, 1), human_infections[i])
+    }
+  }
+}
 
-
+}
 
 
 
