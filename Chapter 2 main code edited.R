@@ -85,20 +85,29 @@ poultry_origin <-rep(NA, nrow(counties))
 #Currently does not take in to account poultry to poultry transmission
 for (t in 1:timesteps) {
   # Spread among birds
-  bird_infections <- which(bird_state == 0 & (bird_adj %*% (bird_state == 1)) > 0)
-  bird_infections_weight <-as.numeric(bird_adj %*% (bird_state == 1))[bird_infections]
-  for (i in 1:length(bird_infections)) {
-    bird_infection_probability = beta_bird_bird + (beta_bird_bird_max - beta_bird_bird) * bird_infections_weight[i] / (bird_infections_weight[i] + 100)
-    #print(bird_infection_probability)
-    if (rbinom(1, 1, bird_infection_probability)) {
-      bird_state[bird_infections[i]] <- 1
-      # Record which infected neighbor caused it
-      infectors <- which(bird_adj[bird_infections[i], ] == 1 & bird_state == 1)
-      if (length(infectors) > 0) {
-        bird_trans_edges[[length(bird_trans_edges) + 1]] <- c(sample(infectors, 1), bird_infections[i])
+  #bird_infections is possibly infected 
+  bird_infectors = which(bird_state > 0)
+  infection_weights = colSums(bird_adj[bird_infectors,] )
+    
+    possible_bird_infected <- which(infection_weights > 0)
+    possible_bird_infected_weight <-infection_weights[possible_bird_infected]
+    bird_infection_probability = beta_bird_bird + (beta_bird_bird_max - beta_bird_bird) * possible_bird_infected_weight / (possible_bird_infected_weight + 100)
+      infection_outcome = rbinom(n = length(bird_infection_probability), 1, bird_infection_probability)
+      new_infections = possible_bird_infected[infection_outcome == 1]
+        bird_state[new_infections] <- 1
+        if (length(new_infections) > 0){
+        for (i in 1:length(new_infections)){
+        # Record which infected neighbor caused it
+          infector_weights = bird_adj[bird_infectors,new_infections[i]] / sum(bird_adj[bird_infectors,new_infections[i]])
+          infector_select = sample(bird_infectors,size = 1, prob = infector_weights)
+          bird_trans_edges[[length(bird_trans_edges) + 1]] <- c(infector_select, new_infections[i])
+        }
       }
-    }
-  }
+      
+    
+  
+      
+  
   
   # Bird → Poultry
   for (i in 1:length(bird_state)) {
@@ -142,18 +151,27 @@ for (t in 1:timesteps) {
   }
   
   }
-  
-  # Human → Human
-  # human_infections <- which(human_state == 0 & (human_adj %*% (human_state == 1)) > 0)
-  # for (i in human_infections) {
-  #   if (rbinom(1, 1, beta_human_human)) {
-  #     human_state[i] <- 1
-  #     infectors <- which(human_adj[i, ] == 1 & human_state == 1)
-  #     if (length(infectors) > 0) {
-  #       human_trans_edges[[length(human_trans_edges) + 1]] <- c(sample(infectors, 1), i)
-  #     }
-  #   }
-  # }
+
+human_infectors = which(human_state > 0)
+human_infection_weights = colSums(human_adj[human_infectors,] )
+
+possible_human_infected <- which(human_infection_weights > 0)
+possible_human_infected_weight <-human_infection_weights[possible_human_infected]
+human_infection_probability = beta_human_human + (beta_human_human_max - beta_human_human) * possible_human_infected_weight / (possible_human_infected_weight + 100)
+human_infection_outcome = rbinom(n = length(human_infection_probability), 1, human_infection_probability)
+human_new_infections = possible_human_infected[human_infection_outcome == 1]
+human_state[human_new_infections] <- 1
+if (length(human_new_infections) > 0){
+  for (i in 1:length(human_new_infections)){
+    # Record which infected neighbor caused it
+    human_infector_weights = human_adj[human_infectors,human_new_infections[i]] / sum(human_adj[human_infectors,human_new_infections[i]])
+    human_infector_select = sample(human_infectors,size = 1, prob = human_infector_weights)
+    human_trans_edges[[length(human_trans_edges) + 1]] <- c(human_infector_select, human_new_infections[i])
+  }
+}
+
+
+
 
 
 
