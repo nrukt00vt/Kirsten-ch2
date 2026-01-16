@@ -151,8 +151,7 @@ for (t in 1:timesteps) {
     }
   }
   
-<<<<<<< HEAD
-  }
+  
 
 human_infectors = which(human_state > 0)
 human_infection_weights = colSums(human_adj[human_infectors,] )
@@ -171,12 +170,10 @@ if (length(human_new_infections) > 0){
     human_trans_edges[[length(human_trans_edges) + 1]] <- c(human_infector_select, human_new_infections[i])
   }
 }
+}
 
 
 
-
-=======
-  
   
   # Human → Human
 human_infections <- which(human_state == 0 & (human_adj %*% (human_state == 1)) > 0)
