@@ -34,8 +34,6 @@ good_points <- st_join(human_points_sf,counties,join=st_within)
 new_ids_usa = data.frame(good_points$geoid_o, good_points$newID)
 names(new_ids_usa) = c("geoid","newID")
 counties_usa = merge(counties, new_ids_usa)
-ggplot() + geom_sf(counties_usa, mapping = aes(), colour="red", fill = "green")
-
 
 library(data.table)
 library(Matrix)
@@ -84,13 +82,6 @@ human_adj[, `:=`(
 )]
 new_ids_usa[, geoid := normalize_geoid(geoid)]
 
-## --- Sanity checks on mapping ---
-# Each geoid should map to exactly one newID
-dup_geoid <- new_ids_usa[, .N, by = geoid][N > 1]
-if (nrow(dup_geoid) > 0) {
-  stop("Found geoids mapping to multiple newIDs. Resolve before aggregating.")
-}
-
 ## --- Attach newIDs to origin and destination ---
 map_o <- new_ids_usa[, .(geoid, newID_o = newID)]
 map_d <- new_ids_usa[, .(geoid, newID_d = newID)]
@@ -98,10 +89,6 @@ map_d <- new_ids_usa[, .(geoid, newID_d = newID)]
 human_mapped <- merge(human_adj, map_o, by.x = "geoid_o", by.y = "geoid", all.x = TRUE)
 human_mapped <- merge(human_mapped, map_d, by.x = "geoid_d", by.y = "geoid", all.x = TRUE)
 
-# Optionally inspect what didn't map
-unmapped <- human_mapped[is.na(newID_o) | is.na(newID_d),
-                         .N, by = .(missing_o = is.na(newID_o), missing_d = is.na(newID_d))]
-print(unmapped)
 
 # Keep only fully mapped OD pairs
 human_mapped <- human_mapped[!is.na(newID_o) & !is.na(newID_d)]
@@ -124,21 +111,6 @@ all_newIDs <- sort(unique(new_ids_usa$newID))
 A_visitors <- make_adj_sparse(flows_newID_total, ids = all_newIDs, weight_col = "visitor_flows")
 A_pop      <- make_adj_sparse(flows_newID_total, ids = all_newIDs, weight_col = "pop_flows")
 
-
-## ===== OPTION B: A list of adjacency matrices, one per date_range =====
-flows_split <- split(flows_newID_week, by = "date_range", keep.by = FALSE)
-
-A_by_week_visitors <- lapply(flows_split, function(dd) {
-  make_adj_sparse(dd[, .(newID_o, newID_d, visitor_flows)], ids = all_newIDs, weight_col = "visitor_flows")
-})
-
-A_by_week_pop <- lapply(flows_split, function(dd) {
-  make_adj_sparse(dd[, .(newID_o, newID_d, pop_flows)], ids = all_newIDs, weight_col = "pop_flows")
-})
-
-## Example:
-# names(A_by_week_visitors)               # date_range strings
-# A_by_week_visitors[[1]]["2148","2149"]  # flow that week
 
 #randomly assign farm numbers to counties
 counties$farm_number = sample(0:10, nrow(counties), replace = T)
