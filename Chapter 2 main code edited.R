@@ -236,32 +236,17 @@ for (t in 1:timesteps) {
       if (length(bird_infection_probability)>0){
       if (rbinom(1, 1, bird_infection_probability)) {
         poultry_state[i] <- 1
-        print(i)
         bird_poultry_trans[i,i] =  bird_poultry_trans[i,i]+1
       }
     }}
   }
   
-  # #poultry to poultry
- #  poultry_infections <- which(poultry_state == 0 & (poultry_adj %*% (poultry_state == 1)) > 0)
-  # for (i in poultry_infections) {
-  #   if (rbinom(1, 1, beta_poultry_poultry)) {
-  #     poultry_state[i] <- 1
-  #     # Record 3which infected neighbor caused it
-  #     infectors <- which(poultry_adj[i, ] == 1 & poultry_state == 1)
-  #     if (length(infectors) > 0) {
-  #       poultry_trans_edges[[length(poultry_trans_edges) + 1]] <- c(sample(infectors, 1), i)
-  #     }
-  #   }
-  # }
   
   # Poultry → Human
   for (i in 1:length(bird_state)) {
     if (poultry_state[i] == 1 && human_state[i] == 0) {
       human_infection_probability = beta_human_human + (beta_human_human_max - beta_human_human) * counties$human_pop[i] / (counties$human_pop[i] + mean(counties$human_pop))
-      print(human_infection_probability)
       if (rbinom(1, 1, human_infection_probability)) {
-        print(paste(i, "infected"))
         human_state[i] <- 1
         poultry_human_trans[i,i] = poultry_human_trans[i,i]+1
       }
@@ -317,17 +302,10 @@ if (length(human_new_infections_id) > 0){
 
 
 
+sum_edges = bird_bird_trans + bird_poultry_trans + poultry_human_trans + human_human_trans
+g <- graph_from_adjacency_matrix(sum_edges)
 
-####Creating community structure and network anaylsis####
-###Make sure all data file names are updated##
-
-# Combine all transmission edges
-all_edges <- do.call(rbind, c(bird_trans_edges, human_trans_edges, cross_trans_edges))
-g <- graph_from_edgelist(as.matrix(all_edges), directed = TRUE)
-
-# Plot the graph
-plot(g, vertex.label.cex=0.8, edge.arrow.size=0.4, layout=layout_with_fr)
-
+g <- graph_from_adjacency_matrix(sum_edges)
 
 #detect communities
 community_graph = walktrap.community(g)
@@ -335,23 +313,20 @@ community_graph = walktrap.community(g)
 members = community_graph$membership
 members[is.element(members,which(table(community_graph$membership)<10))] = NA
 counties$membership = members
-counties_communities_only = subset(counties,!is.element(membership,communities_remove))
+counties_communities_only = subset(counties,!is.na(membership))
 #plot shapefile
 commplot = ggplot()   + 
   geom_sf(colour="NA",data=counties,size=.5,fill="light grey")+
   geom_sf(colour="NA",data=counties_communities_only,size=.5, mapping = aes(fill = as.factor(membership))) +
-  ggtitle(paste0("Commplot; total connections: ", sum(county_adjacency_matrix), " Species: ","Transmission trial"))+
   xlim(-170,-63) + ylim(22,72)
 
-ggsave(commplot, filename=paste0("commplot","Transmission trial",".png"))
 
 #eigenvector centrality 
-counties$evec = eigen_centrality(graph)$vector
+counties$evec = eigen_centrality(g)$vector
 
 evec_plot = ggplot()   +
   geom_sf(colour="NA",data=counties,size=.5, mapping = aes(fill = evec)) +
   scale_fill_distiller(palette="YlOrRd",trans="log10")+
-  ggtitle(paste0("Eigenvector centrality; total connections: ", sum(county_adjacency_matrix), " Species: ","Transmission trial"))+
   xlim(-170,-63) + ylim(22,72)
 ggsave(evec_plot, filename=paste0("evecplot",'Transmission trial',".png"))
 
@@ -361,7 +336,6 @@ counties$betweenness = betweenness(graph)
 betweenness_plot = ggplot()   +
   geom_sf(colour="NA",data=counties,size=.5, mapping = aes(fill = betweenness)) +
   scale_fill_distiller(palette="Spectral",trans="log2")+
-  ggtitle(paste0("Betweenness centrality; Total connections: ", sum(county_adjacency_matrix), " Species: ","Transmission trial"))+
   xlim(-170,-63) + ylim(22,72)
 
 ggsave(betweenness_plot, filename=paste0("betweennessplot","Transmission trial",".png"))
