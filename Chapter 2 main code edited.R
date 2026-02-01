@@ -309,25 +309,6 @@ if (length(human_new_infections_id) > 0){
 }
 
 
-
-  
-  # Human → Human
-human_infections <- which(human_state == 0 & (human_adj %*% (human_state == 1)) > 0)
-human_infections_weight <-as.numeric(human_adj %*% (human_state == 1))[human_infections]
-for (i in 1:length(human_infections)) {
-  human_infection_probability = beta_human_human + (beta_human_human_max - beta_human_human) * human_infections_weight[i] / (human_infections_weight[i] + 100)
-  #print(human_infection_probability)
-  if (rbinom(1, 1, human_infection_probability)) {
-    human_state[human_infections[i]] <- 1
-    # Record which infected neighbor caused it
-    human_infectors <- which(human_adj[human_infections[i], ] == 1 & human_state == 1)
-    if (length(human_infectors) > 0) {
-      human_trans_edges[[length(human_trans_edges) + 1]] <- c(sample(infectors, 1), human_infections[i])
-    }
-  }
-}
->>>>>>> d72e410a34a9fb3f8eee5bbc84ba19b0ef4d6311
-
 }
 
 
