@@ -189,14 +189,16 @@ bird_trans_edges <- list()
 human_trans_edges <- list()
 cross_trans_edges <- list()
 
+bird_bird_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
+bird_poultry_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
+poultry_human_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
+human_human_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
+
+
 # spillover_probability <- function(interaction_count) {
 #   1 - exp(-0.3 * interaction_count)
 # }
 
-# Initialize vector to store initial infection location for each bird and poultry
-#Not accurate for current code
-bird_origin <- rep(NA, nrow(counties))
-poultry_origin <-rep(NA, nrow(counties))
 
 #Currently does not take in to account poultry to poultry transmission
 for (t in 1:timesteps) {
@@ -216,7 +218,7 @@ for (t in 1:timesteps) {
         # Record which infected neighbor caused it
           infector_weights = bird_adj[bird_infectors,new_infections[i]] / sum(bird_adj[bird_infectors,new_infections[i]])
           infector_select = sample(bird_infectors,size = 1, prob = infector_weights)
-          bird_trans_edges[[length(bird_trans_edges) + 1]] <- c(infector_select, new_infections[i])
+          bird_bird_trans[infector_select,new_infections[i]] = bird_bird_trans[infector_select,new_infections[i]] +1
         }
       }
       
@@ -235,7 +237,7 @@ for (t in 1:timesteps) {
       if (rbinom(1, 1, bird_infection_probability)) {
         poultry_state[i] <- 1
         print(i)
-        cross_trans_edges[[length(cross_trans_edges) + 1]] <- c(paste0("Bird", i), paste0("Poultry", i))
+        bird_poultry_trans[i,i] =  bird_poultry_trans[i,i]+1
       }
     }}
   }
@@ -261,7 +263,7 @@ for (t in 1:timesteps) {
       if (rbinom(1, 1, human_infection_probability)) {
         print(paste(i, "infected"))
         human_state[i] <- 1
-        cross_trans_edges[[length(cross_trans_edges) + 1]] <- c(paste0("Poultry", i), paste0("Human", i))
+        poultry_human_trans[i,i] = poultry_human_trans[i,i]+1
       }
     }
   }
@@ -269,7 +271,7 @@ for (t in 1:timesteps) {
   
 human_adj = as.matrix(A_pop)
 human_infectors = which(human_state > 0)
-human_infectors_mobility=colnames(human_adj)[is.element(colnames(human_adj), human_infectors)]
+human_infectors_mobility=as.numeric(colnames(human_adj)[is.element(colnames(human_adj), human_infectors)])
 
 human_infectors_colsrows=which(is.element(colnames(human_adj), human_infectors_mobility))
 
@@ -288,7 +290,7 @@ human_infection_probability = beta_human_human + (beta_human_human_max - beta_hu
 human_infection_outcome = rbinom(n = length(human_infection_probability), 1, human_infection_probability)
 human_new_infections = possible_human_infected[human_infection_outcome == 1]
 
-human_new_infections_id = colnames(human_adj)[human_new_infections]
+human_new_infections_id = as.numeric(colnames(human_adj)[human_new_infections])
 human_state[human_new_infections_id] <- 1
 if (length(human_new_infections_id) > 0){
   if (length(human_infectors_mobility) > 1){
@@ -296,13 +298,14 @@ if (length(human_new_infections_id) > 0){
     # Record which infected neighbor caused it
     
     human_infector_weights = human_adj[human_infectors_colsrows,human_new_infections[i]] / sum(human_adj[human_infectors_colsrows,human_new_infections[i]])
-    human_infector_select = sample(human_infectors_mobility,size = 1, prob = human_infector_weights)
-    human_trans_edges[[length(human_trans_edges) + 1]] <- c(human_infector_select, human_new_infections_id[i])
+    human_infector_select = as.numeric(sample(human_infectors_mobility,size = 1, prob = human_infector_weights))
+    human_human_trans[human_infector_select, human_new_infections_id[i]] = human_human_trans[human_infector_select, human_new_infections_id[i]]+1
   }
   }
     if (length(human_infectors_mobility) == 1){
       for (i in 1:length(human_new_infections_id)){
-        human_trans_edges[[length(human_trans_edges) + 1]] <- c(human_infectors_mobility, human_new_infections_id[i])
+        human_human_trans[human_infectors_mobility, human_new_infections_id[i]] = 
+          human_human_trans[human_infectors_mobility, human_new_infections_id[i]]+1
     }
   }
 }
