@@ -143,23 +143,21 @@ human_state <- rep(0, nrow(counties))
 # Introduce disease in migratory birds
 bird_state[sample(1:length(bird_state),  3)] <- 1
 # Parameters
-beta_bird_poultry <- 0.1   # transmission from bird to poultry
-beta_bird_poultry_max <- 0.5  #within-poultry spread
+beta_bird_poultry <- 3e-7  # transmission from bird to poultry
+beta_bird_poultry_max <- 9e-5  #within-poultry spread -- per farm per day (Llanos-Soto et al 2025)
 
 beta_poultry_human <- 0.02  # transmission from poultry to humans
 beta_poultry_human_max <- 0.5  # transmission from poultry to humans
-beta_bird_bird <- 0.01      # within-bird spread
-beta_bird_bird_max <-.5
+beta_bird_bird <- 0.04      # within-bird spread
+beta_bird_bird_max <-.08 #Henaux et al 2010
 beta_human_human <- 0.005   # within-human spread
 beta_human_human_max <- 0.1   # within-human spread
-beta_poultry_poulty <- 0.03  #within-poultry spread
-beta_poultry_poulty_max <- 0.5  #within-poultry spread
+beta_poultry_poulty <- 0.05  #within-poultry spread # https://experts.umn.edu/en/publications/estimating-the-between-farm-transmission-rates-for-highly-pathoge/
+beta_poultry_poulty_max <- 0.15  #within-poultry spread
 
 #Transmission model 
 # Initialize edge lists for tracking transmission
-bird_trans_edges <- list()
-human_trans_edges <- list()
-cross_trans_edges <- list()
+
 
 bird_bird_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
 bird_poultry_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
@@ -171,9 +169,10 @@ human_human_trans = matrix(0, dim(bird_adj)[1], dim(bird_adj)[2])
 #   1 - exp(-0.3 * interaction_count)
 # }
 
-
+timesteps = 50
 #Currently does not take in to account poultry to poultry transmission
 for (t in 1:timesteps) {
+  print(t)
   # Spread among birds
   #bird_infections is possibly infected 
   bird_infectors = which(bird_state > 0)
@@ -204,7 +203,7 @@ for (t in 1:timesteps) {
     
 
     if (bird_state[i] == 1 && poultry_state[i] == 0) {
-      bird_infection_probability = beta_bird_poultry + (beta_bird_poultry_max - beta_bird_poultry) * counties$farm_number[i] / (counties$farm_number[i] + 100)
+      bird_infection_probability = min( beta_bird_poultry *counties$farm_number[i] , beta_bird_poultry_max)
       if (length(bird_infection_probability)>0){
       if (rbinom(1, 1, bird_infection_probability)) {
         poultry_state[i] <- 1
@@ -217,7 +216,7 @@ for (t in 1:timesteps) {
   # Poultry → Human
   for (i in 1:length(bird_state)) {
     if (poultry_state[i] == 1 && human_state[i] == 0) {
-      human_infection_probability = beta_human_human + (beta_human_human_max - beta_human_human) * counties$human_pop[i] / (counties$human_pop[i] + mean(counties$human_pop))
+      human_infection_probability = beta_poultry_human + (beta_poultry_human_max - beta_poultry_human) * counties$human_pop[i] / (counties$human_pop[i] + mean(counties$human_pop))
       if (rbinom(1, 1, human_infection_probability)) {
         human_state[i] <- 1
         poultry_human_trans[i,i] = poultry_human_trans[i,i]+1
@@ -277,7 +276,6 @@ if (length(human_new_infections_id) > 0){
 sum_edges = bird_bird_trans + bird_poultry_trans + poultry_human_trans + human_human_trans
 g <- graph_from_adjacency_matrix(sum_edges)
 
-g <- graph_from_adjacency_matrix(sum_edges)
 
 #detect communities
 community_graph = walktrap.community(g)
