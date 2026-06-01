@@ -9,7 +9,7 @@ library(exactextractr)
 
 #Read in migratory bird and human adjancency matrices
 bird_adj = as.matrix(read.csv("adj2/county_adjacency_matrix_blue_winged_teal_county_y.csv")[,-1])
-human_adj = read.csv("~/Downloads/weekly_county2county_2019_01_28.csv")
+human_adj = read.csv("C:/Users/nrukt00/Downloads/weekly_county2county_2019_01_28.csv")
 
 
 human_points = unique(human_adj[c("geoid_o", "lng_o", "lat_o")])
@@ -24,7 +24,7 @@ wgs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 #Assign wgs84 to raster with lambert projection
 human_pop=projectRaster(human_pop, crs=wgs)
 #Read in the spatial layer
-counties = read_sf(dsn = "gadm36_levels_shp", layer = "gadm36_2")
+counties = read_sf(dsn = "C:/Users/nrukt00/Downloads/gadm36_levels_shp", layer = "gadm36_2")
 counties = subset(counties,is.element(NAME_0,c("Canada","United States","Mexico")))
 counties$human_pop <- exact_extract(human_pop, counties, fun = "sum")
 counties$newID = 1:nrow(counties)
