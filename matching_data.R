@@ -1,10 +1,12 @@
 library(sf)
 library(tidyr)
-shapefile = read_sf(dsn= "gadm36", layer = "gadm36_2")
+shapefile = counties
 shapefile = subset(shapefile, NAME_0 == "United States")
+
+shapefile_all = shapefile[0,]
 shapefile_state = subset(shapefile,NAME_1 == "Arkansas")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Arkansas.csv")
+data_file = read.csv("Poultry State CSV/Arkansas.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -35,12 +37,11 @@ shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_lo
 
 shapefile_state$Item[missing_rows[4]] = data_file_long$Item[which(data_file_long$name == "Van.Buren")]
 shapefile_state$value[missing_rows[4]] = data_file_long$value[which(data_file_long$name == "Van.Buren")]
-
+shapefile_all = rbind(shapefile_all,shapefile_state)
 shapefile_state_alabama = shapefile_state
-
 shapefile_state2 = subset(shapefile,NAME_1 == "Arizona")
 
-data_file2 = read.csv("~/Desktop/Census Data/Poultry State CSV/Arizona.csv")
+data_file2 = read.csv("Poultry State CSV/Arizona.csv")
 data_file2 = data_file2[-1,]
 data_file2 = data_file2[1,]
 
@@ -65,11 +66,11 @@ shapefile_state2$value[missing_rows2[1]] = data_file_long2$value[which(data_file
 shapefile_state2$Item[missing_rows2[2]] = data_file_long2$Item[which(data_file_long2$name == "Santa..Cruz")]
 shapefile_state2$value[missing_rows2[2]] = data_file_long2$value[which(data_file_long2$name == "Santa..Cruz")]
 
-shapefile_state_arizona = shapefile_state2
+shapefile_all = rbind(shapefile_all,shapefile_state2); shapefile_state_arizona = shapefile_state2
 
 shapefile_state = subset(shapefile,NAME_1 == "California")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/California.csv")
+data_file = read.csv("Poultry State CSV/California.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -132,11 +133,11 @@ shapefile_state$Item[missing_rows[14]] = data_file_long$Item[which(data_file_lon
 shapefile_state$value[missing_rows[14]] = data_file_long$value[which(data_file_long$name == "Santa.Cruz")]
 
 
-shapefile_state_california = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_california = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Colorado")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Colorado.csv")
+data_file = read.csv("Poultry State CSV/Colorado.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -183,11 +184,11 @@ shapefile_state$value[missing_rows[8]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[9]] = data_file_long$Item[which(data_file_long$name == "San.Miguel")]
 shapefile_state$value[missing_rows[9]] = data_file_long$value[which(data_file_long$name == "San.Miguel")]
 
-shapefile_state_colorado = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_colorado = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Connecticut")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Connecticut.csv")
+data_file = read.csv("Poultry State CSV/Connecticut.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -213,11 +214,11 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[2]] = data_file_long$Item[which(data_file_long$name == "New.London")]
 shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_long$name == "New.London")]
 
-shapefile_state_connecticut = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_connecticut = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Delaware")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Delaware.csv")
+data_file = read.csv("Poultry State CSV/Delaware.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -240,11 +241,11 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "New.Castle")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "New.Castle")]
 
-shapefile_state_delaware = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_delaware = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Florida")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Florida.csv")
+data_file = read.csv("Poultry State CSV/Florida.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -285,11 +286,11 @@ shapefile_state$value[missing_rows[6]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[7]] = data_file_long$Item[which(data_file_long$name == "Santa.Rosa")]
 shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_long$name == "Santa.Rosa")]
 
-shapefile_state_florida = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_florida = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Georgia")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Georgia.csv")
+data_file = read.csv("Poultry State CSV/Georgia.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -315,12 +316,12 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "Jeff.Davis")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "Jeff.Davis")]
 
-shapefile_state_georgia = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_georgia = shapefile_state
 
 #Missing Kalawao
 shapefile_state = subset(shapefile,NAME_1 == "Hawaii")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Hawaii.csv")
+data_file = read.csv("Poultry State CSV/Hawaii.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -342,7 +343,7 @@ missing_rows = which(is.na(shapefile_state$value))
 
 shapefile_state = subset(shapefile,NAME_1 == "Idaho")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Idaho.csv")
+data_file = read.csv("Poultry State CSV/Idaho.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -372,7 +373,7 @@ shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_lo
 
 shapefile_state = subset(shapefile,NAME_1 == "Illinois")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Illinois.csv")
+data_file = read.csv("Poultry State CSV/Illinois.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -413,12 +414,12 @@ shapefile_state$value[missing_rows[6]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[7]] = data_file_long$Item[which(data_file_long$name == "St..Clair")]
 shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_long$name == "St..Clair")]
 
-shapefile_state_illinois = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_illinois = shapefile_state
 
 #Missing Lake Michigan
 shapefile_state = subset(shapefile,NAME_1 == "Indiana")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Indiana.csv")
+data_file = read.csv("Poultry State CSV/Indiana.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -444,11 +445,11 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[3]] = data_file_long$Item[which(data_file_long$name == "St..Joseph")]
 shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_long$name == "St..Joseph")]
 
-shapefile_state_indiana = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_indiana = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Iowa")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Iowa.csv")
+data_file = read.csv("Poultry State CSV/Iowa.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -489,11 +490,11 @@ shapefile_state$value[missing_rows[6]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[7]] = data_file_long$Item[which(data_file_long$name == "Van.Buren")]
 shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_long$name == "Van.Buren")]
 
-shapefile_state_iowa = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_iowa = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Louisiana")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Louisiana.csv")
+data_file = read.csv("Poultry State CSV/Louisiana.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -573,11 +574,11 @@ shapefile_state$value[missing_rows[19]] = data_file_long$value[which(data_file_l
 shapefile_state$Item[missing_rows[20]] = data_file_long$Item[which(data_file_long$name == "West.Feliciana")]
 shapefile_state$value[missing_rows[21]] = data_file_long$value[which(data_file_long$name == "West.Feliciana")]
 
-shapefile_state_Louisiana = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_Louisiana = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Maryland")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Maryland.csv")
+data_file = read.csv("Poultry State CSV/Maryland.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -609,12 +610,12 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "St..Mary.s")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "St..Mary.s")]
 
-shapefile_state_maryland = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_maryland = shapefile_state
 
 #Missing Lake Hurron, Lake Michigan, Lake St. Clair, Lake Superior
 shapefile_state = subset(shapefile,NAME_1 == "Michigan")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Michigan.csv")
+data_file = read.csv("Poultry State CSV/Michigan.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -652,7 +653,7 @@ shapefile_state$value[missing_rows[9]] = data_file_long$value[which(data_file_lo
 #Missing Lake Superior
 shapefile_state = subset(shapefile,NAME_1 == "Minnesota")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Minnesota.csv")
+data_file = read.csv("Poultry State CSV/Minnesota.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -705,11 +706,11 @@ shapefile_state$value[missing_rows[11]] = data_file_long$value[which(data_file_l
 shapefile_state$Item[missing_rows[12]] = data_file_long$Item[which(data_file_long$name == "Yellow.Medicine")]
 shapefile_state$value[missing_rows[12]] = data_file_long$value[which(data_file_long$name == "Yellow.Medicine")]
 
-shapefile_state_minnesota = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_minnesota = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Mississippi")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Mississippi.csv")
+data_file = read.csv("Poultry State CSV/Mississippi.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -738,11 +739,11 @@ shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[3]] = data_file_long$Item[which(data_file_long$name == "Pearl.River")]
 shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_long$name == "Pearl.River")]
 
-shapefile_state_mississippi = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_mississippi = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Missouri")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Missouri.csv")
+data_file = read.csv("Poultry State CSV/Missouri.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -786,11 +787,11 @@ shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[8]] = data_file_long$Item[which(data_file_long$name == "St..Louis")]
 shapefile_state$value[missing_rows[8]] = data_file_long$value[which(data_file_long$name == "St..Louis")]
 
-shapefile_state_missouri = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_missouri = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Montana")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Montana.csv")
+data_file = read.csv("Poultry State CSV/Montana.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -834,11 +835,11 @@ shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[8]] = data_file_long$Item[which(data_file_long$name == "Sweet.Grass")]
 shapefile_state$value[missing_rows[8]] = data_file_long$value[which(data_file_long$name == "Sweet.Grass")]
 
-shapefile_state_montana = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_montana = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Nebraska")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Nebraska.csv")
+data_file = read.csv("Poultry State CSV/Nebraska.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -870,11 +871,11 @@ shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[4]] = data_file_long$Item[which(data_file_long$name == "Scotts.Bluff")]
 shapefile_state$value[missing_rows[4]] = data_file_long$value[which(data_file_long$name == "Scotts.Bluff")]
 
-shapefile_state_nebraska = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_nebraska = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Nevada")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Nevada.csv")
+data_file = read.csv("Poultry State CSV/Nevada.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -900,11 +901,11 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[2]] = data_file_long$Item[which(data_file_long$name == "Carson.City")]
 shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_long$name == "Carson.City")]
 
-shapefile_state_nevada = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_nevada = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "New Jersey")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/New Jersey.csv")
+data_file = read.csv("Poultry State CSV/New Jersey.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -927,11 +928,11 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "Cape.May")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "Cape.May")]
 
-shapefile_state_new_jersey = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_new_jersey = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "New Mexico")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/New Mexico.csv")
+data_file = read.csv("Poultry State CSV/New Mexico.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -972,12 +973,12 @@ shapefile_state$value[missing_rows[6]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[7]] = data_file_long$Item[which(data_file_long$name == "Santa.Fe")]
 shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_long$name == "Santa.Fe")]
 
-shapefile_state_new_mexico = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_new_mexico = shapefile_state
 
 #Missing Lake Ontario
 shapefile_state = subset(shapefile,NAME_1 == "New York")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/New York.csv")
+data_file = read.csv("Poultry State CSV/New York.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1003,11 +1004,11 @@ shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[3]] = data_file_long$Item[which(data_file_long$name == "St..Lawrence")]
 shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_long$name == "St..Lawrence")]
 
-shapefile_state_new_york = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_new_york = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "North Carolina")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/North Carolina.csv")
+data_file = read.csv("Poultry State CSV/North Carolina.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1030,11 +1031,11 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "New.Hanover")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "New.Hanover")]
 
-shapefile_state_north_carolina = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_north_carolina = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "North Dakota")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/North Dakota.csv")
+data_file = read.csv("Poultry State CSV/North Dakota.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1063,12 +1064,12 @@ shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[3]] = data_file_long$Item[which(data_file_long$name == "LaMoure")]
 shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_long$name == "LaMoure")]
 
-shapefile_state_north_dakota = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_north_dakota = shapefile_state
 
 #Missing Lake Erie
 shapefile_state = subset(shapefile,NAME_1 == "Ohio")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Ohio.csv")
+data_file = read.csv("Poultry State CSV/Ohio.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1091,11 +1092,11 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[2]] = data_file_long$Item[which(data_file_long$name == "Van.Wert")]
 shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_long$name == "Van.Wert")]
 
-shapefile_state_ohio = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_ohio = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Oklahoma")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Oklahoma.csv")
+data_file = read.csv("Poultry State CSV/Oklahoma.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1121,11 +1122,11 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[2]] = data_file_long$Item[which(data_file_long$name == "Roger.Mills")]
 shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_long$name == "Roger.Mills")]
 
-shapefile_state_oklahoma = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_oklahoma = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Oregon")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Oregon.csv")
+data_file = read.csv("Poultry State CSV/Oregon.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1148,11 +1149,11 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "Hood.River")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "Hood.River")]
 
-shapefile_state_oregon = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_oregon = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Pennsylvania")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Pennsylvania.csv")
+data_file = read.csv("Poultry State CSV/Pennsylvania.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1175,12 +1176,12 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "McKean")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "McKean")]
 
-shapefile_state_pennsylvania = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_pennsylvania = shapefile_state
 
 #Missing Shannon
 shapefile_state = subset(shapefile,NAME_1 == "South Dakota")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/South Dakota.csv")
+data_file = read.csv("Poultry State CSV/South Dakota.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1209,11 +1210,11 @@ shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[3]] = data_file_long$Item[which(data_file_long$name == "Fall.River")]
 shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_long$name == "Fall.River")]
 
-shapefile_state_south_dakota = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_south_dakota = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Tennessee")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Tennessee.csv")
+data_file = read.csv("Poultry State CSV/Tennessee.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1236,11 +1237,11 @@ missing_rows = which(is.na(shapefile_state$value))
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "Van.Buren")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "Van.Buren")]
 
-shapefile_state_tennessee = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_tennessee = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Texas")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Texas.csv")
+data_file = read.csv("Poultry State CSV/Texas.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1314,11 +1315,11 @@ shapefile_state$value[missing_rows[17]] = data_file_long$value[which(data_file_l
 shapefile_state$Item[missing_rows[18]] = data_file_long$Item[which(data_file_long$name == "Van.Zandt")]
 shapefile_state$value[missing_rows[18]] = data_file_long$value[which(data_file_long$name == "Van.Zandt")]
 
-shapefile_state_texas = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_texas = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Utah")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Utah.csv")
+data_file = read.csv("Poultry State CSV/Utah.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1347,11 +1348,11 @@ shapefile_state$value[missing_rows[2]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[3]] = data_file_long$Item[which(data_file_long$name == "San.Juan")]
 shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_long$name == "San.Juan")]
 
-shapefile_state_utah = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_utah = shapefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Washington")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Washington.csv")
+data_file = read.csv("Poultry State CSV/Washington.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1383,12 +1384,12 @@ shapefile_state$value[missing_rows[3]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[4]] = data_file_long$Item[which(data_file_long$name == "Walla.Walla")]
 shapefile_state$value[missing_rows[4]] = data_file_long$value[which(data_file_long$name == "Walla.Walla")]
 
-shapefile_state_washington = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_washington = shapefile_state
 
 #Missing Lake Michigan and Lake Superior
 shapefile_state = subset(shapefile,NAME_1 == "Wisconsin")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Wisconsin.csv")
+data_file = read.csv("Poultry State CSV/Wisconsin.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1423,11 +1424,11 @@ shapefile_state$value[missing_rows[4]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[7]] = data_file_long$Item[which(data_file_long$name == "St..Croix")]
 shapefile_state$value[missing_rows[7]] = data_file_long$value[which(data_file_long$name == "St..Croix")]
 
-shapefile_state_wisconsin = statefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_wisconsin = shatefile_state
 
 shapefile_state = subset(shapefile,NAME_1 == "Wyoming")
 
-data_file = read.csv("~/Desktop/Census Data/Poultry State CSV/Wyoming.csv")
+data_file = read.csv("Poultry State CSV/Wyoming.csv")
 data_file = data_file[-1,]
 data_file = data_file[1,]
 
@@ -1453,4 +1454,5 @@ shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_lo
 shapefile_state$Item[missing_rows[1]] = data_file_long$Item[which(data_file_long$name == "Hot.Springs")]
 shapefile_state$value[missing_rows[1]] = data_file_long$value[which(data_file_long$name == "Hot.Springs")]
 
-shapefile_state_wyoming = shapefile_state
+shapefile_all = rbind(shapefile_all,shapefile_state); shapefile_state_wyoming = shapefile_state
+

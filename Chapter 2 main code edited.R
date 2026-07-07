@@ -9,7 +9,7 @@ library(exactextractr)
 
 #Read in migratory bird and human adjancency matrices
 bird_adj = as.matrix(read.csv("adj2/county_adjacency_matrix_blue_winged_teal_county_y.csv")[,-1])
-human_adj = read.csv("C:/Users/nrukt00/Downloads/weekly_county2county_2019_01_28.csv")
+human_adj = read.csv("weekly_county2county_2019_01_28.csv")
 
 
 human_points = unique(human_adj[c("geoid_o", "lng_o", "lat_o")])
@@ -24,7 +24,9 @@ wgs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 #Assign wgs84 to raster with lambert projection
 human_pop=projectRaster(human_pop, crs=wgs)
 #Read in the spatial layer
-counties = read_sf(dsn = "C:/Users/nrukt00/Downloads/gadm36_levels_shp", layer = "gadm36_2")
+counties = read_sf(dsn = "~/Downloads/gadm36_levels_shp", layer = "gadm36_2")
+
+#counties = read_sf(dsn = "C:/Users/nrukt00/Downloads/gadm36_levels_shp", layer = "gadm36_2")
 counties = subset(counties,is.element(NAME_0,c("Canada","United States","Mexico")))
 counties$human_pop <- exact_extract(human_pop, counties, fun = "sum")
 counties$newID = 1:nrow(counties)
@@ -111,11 +113,12 @@ all_newIDs <- sort(unique(new_ids_usa$newID))
 A_visitors <- make_adj_sparse(flows_newID_total, ids = all_newIDs, weight_col = "visitor_flows")
 A_pop      <- make_adj_sparse(flows_newID_total, ids = all_newIDs, weight_col = "pop_flows")
 
-
+farm_data = read.csv("US_farm_data.csv")
 #randomly assign farm numbers to counties
-counties$farm_number = sample(0:10, nrow(counties), replace = T)
+counties = merge(counties,farm_data,by="GID_2", all=T)
+counties$farm_number = counties$value
+counties$farm_number[is.na(counties$farm_number)] = 0
 #Associate poultry data with locations
-
 # 
 # #coords from banding data, change to location in poultry data
 # poultry = subset(poultry, !is.na(LON_DD) & !is.na(LAT_DD))
